@@ -3,6 +3,12 @@
 version = 3
 
 [[package]]
+name = "async-events"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1eb8444c77a890bf63986255d2caa55baa11526defd36bdf0e63fb8d89ee859b"
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -303,6 +309,12 @@ checksum = "258451ab10b34f8af53416d1fdab72c22e805f0c92a1136d59470ec0b11138b2"
 dependencies = [
  "wasm-bindgen",
 ]
+
+[[package]]
+name = "json"
+version = "0.12.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "078e285eafdfb6c4b434e0d31e8cfcb5115b651496faca5749b88fafd4f23bfd"
 
 [[package]]
 name = "lazy_static"
@@ -667,6 +679,9 @@ dependencies = [
 name = "simple_web_request"
 version = "0.1.0"
 dependencies = [
+ "async-events",
+ "base64",
+ "json",
  "open",
  "reqwest",
  "tokio",
