@@ -6,12 +6,20 @@ use crate::header::{HeaderMap, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE};
 use reqwest::header;
 use reqwest::header::HeaderValue;
 use reqwest::Client;
+use serde::Deserialize;
 use std::collections::HashMap;
 
 const CLIENT_ID: &str = "422489842a194b639397736aefc2a55a";
 const CLIENT_SECRET: &str = "cad6f1f0d0724e50b0ebf9d457142d65";
 const REQUEST_URL: &str = "https://accounts.spotify.com/api/token";
 const POST_TYPE: &str = "application/x-www-form-urlencoded";
+
+#[derive(Deserialize, Debug)]
+struct ResponseJson {
+    _access_token: String,
+    _token_type: String,
+    _expires_in: u16,
+}
 
 // Spotify requires base64 encoding of client credentials when making API calls
 fn encode_client_credentials() -> String {
@@ -40,28 +48,44 @@ fn generate_header(authorization_string: String) -> HeaderMap {
     return headers;
 }
 
-// Make POST call and return response encapsulated in Box, also checking for errors
 // TODO Replace hardcoded values
-async fn get_response() -> Result<String, Box<dyn std::error::Error>> {
-    let headers = generate_header(client_authorization(encode_client_credentials()));
-
+fn set_parameters() -> HashMap<&'static str, &'static str> {
     let mut params = HashMap::new();
     params.insert("grant_type", "client_credentials");
+    return params;
+}
+
+// Make POST call and return response as deserialized JSON
+async fn get_response_json() -> ResponseJson {
+    let headers = generate_header(client_authorization(encode_client_credentials()));
 
     let client = Client::new();
-    let body = client
+    let resp = client
         .post(REQUEST_URL)
-        .query(&params)
+        .query(&set_parameters())
         .headers(headers)
         .send()
-        .await?
-        .text()
-        .await?;
-    Ok(body)
+        .await
+        .unwrap();
+    match resp.status() {
+        reqwest::StatusCode::OK => {
+            return resp.json::<ResponseJson>().await.unwrap();
+        }
+        reqwest::StatusCode::UNAUTHORIZED => {
+            panic!("Need new token");
+        }
+        _ => {
+            panic!("Error at making API call");
+        }
+    }
+}
+
+fn extract_token(response_json: ResponseJson) -> String {
+    return response_json._access_token;
 }
 
 #[tokio::main]
 async fn main() {
-    let response = get_response().await;
-    println!("response = {:#?}", response);
+    println!("{}", extract_token(get_response_json().await));
+    // println!("{:#?}", get_response_json().await);
 }
