@@ -15,3 +15,5 @@ tokio = { version = "1.12.0", features = ["full"] }
 
 # https://docs.rs/base64/0.13.0/base64/
 base64 = "0.13.0"
+
+serde = { version = "1.0.144", features = ["derive"] }
