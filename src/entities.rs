@@ -3,7 +3,7 @@ use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use crate::api_response::APIResponse;
 use crate::entities::album::Album;
 
-mod album;
+pub(crate) mod album;
 mod artist;
 mod track;
 
@@ -22,8 +22,9 @@ pub async fn get_albums(artist : &str, client : Client, token : String) {
         .unwrap();
     match response.status() {
         reqwest::StatusCode::OK => {
-            let parsed = response.json::<APIResponse<Album>>().await.unwrap();
-            let albums = parsed.get_items().get_items().iter().collect();
+            let parsed = response.json::<APIResponse>().await.unwrap();
+            let elements = parsed.albums;
+            let albums : Vec<Album> = elements.items;
             for album in albums {
                 album.print_album();
             }

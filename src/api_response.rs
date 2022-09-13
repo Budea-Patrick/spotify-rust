@@ -1,23 +1,12 @@
 use serde::Deserialize;
+use crate::entities::album::Album;
 
 #[derive(Deserialize, Debug)]
-struct Items<T> {
-    items: Vec<T>,
-}
-
-impl<T> Items<T> {
-    pub(crate) fn get_items(self) -> Vec<T> {
-        return self.items;
-    }
+pub(crate) struct Items<T> {
+    pub(crate) items: Vec<T>,
 }
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct APIResponse<T> {
-    items: Items<T>,
-}
-
-impl<T> APIResponse<T> {
-    pub(crate) fn get_items(self) -> Items<T> {
-        return self.items;
-    }
+pub(crate) struct APIResponse {
+    pub(crate) albums: Items<Album>,
 }

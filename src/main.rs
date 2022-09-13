@@ -1,6 +1,7 @@
 mod token;
 mod entities;
 mod api_response;
+mod external_url;
 
 use std::collections::HashMap;
 use std::fmt::format;
