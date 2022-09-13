@@ -49,7 +49,6 @@ fn set_parameters() -> HashMap<&'static str, &'static str> {
 
 async fn get_response_json() -> ResponseJson {
     let headers = generate_header(client_authorization(encode_client_credentials()));
-
     let client = Client::new();
     let resp = client
         .post(REQUEST_URL)
