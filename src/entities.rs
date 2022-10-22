@@ -1,15 +1,17 @@
-use reqwest::Client;
+use reqwest::{Client, StatusCode};
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE};
-use crate::api_response::APIResponse;
+
+use crate::api_response::AlbumResponse;
 use crate::entities::album::Album;
 
-pub(crate) mod album;
+pub mod album;
 mod artist;
 mod track;
+mod image;
 
 const JSON_CONTENT_TYPE: &str = "application/json";
 
-pub async fn get_albums(artist : &str, client : Client, token : String) {
+pub async fn get_album_response(artist: &str, client: Client, token: String) {
     let url = format!(
         "https://api.spotify.com/v1/search?q={artist}&type=album",
         artist = artist);
@@ -21,15 +23,16 @@ pub async fn get_albums(artist : &str, client : Client, token : String) {
         .await
         .unwrap();
     match response.status() {
-        reqwest::StatusCode::OK => {
-            let parsed = response.json::<APIResponse>().await.unwrap();
+        StatusCode::OK => {
+            let parsed = response.json::<AlbumResponse>().await.unwrap();
             let elements = parsed.albums;
-            let albums : Vec<Album> = elements.items;
+            let albums: Vec<Album> = elements.items;
             for album in albums {
-                album.print_album();
+                println!("{}", album);
+                album.print_covers();
             }
         }
-        reqwest::StatusCode::UNAUTHORIZED => {
+        StatusCode::UNAUTHORIZED => {
             println!("Token expired");
         }
         _ => {

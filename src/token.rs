@@ -1,12 +1,10 @@
 use std::collections::HashMap;
-use std::fmt::format;
 
 use reqwest::Client;
-use reqwest::header;
 use reqwest::header::HeaderValue;
 use serde::Deserialize;
 
-use crate::header::{ACCEPT, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, HeaderMap};
+use crate::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, HeaderMap};
 
 const CLIENT_ID: &str = "422489842a194b639397736aefc2a55a";
 const CLIENT_SECRET: &str = "cad6f1f0d0724e50b0ebf9d457142d65";

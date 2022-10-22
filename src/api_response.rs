@@ -1,4 +1,5 @@
 use serde::Deserialize;
+
 use crate::entities::album::Album;
 
 #[derive(Deserialize, Debug)]
@@ -7,6 +8,6 @@ pub(crate) struct Items<T> {
 }
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct APIResponse {
+pub(crate) struct AlbumResponse {
     pub(crate) albums: Items<Album>,
 }

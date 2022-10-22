@@ -1,4 +1,5 @@
 use serde::Deserialize;
+
 use crate::external_url::ExternalUrls;
 
 #[derive(Deserialize, Debug)]
