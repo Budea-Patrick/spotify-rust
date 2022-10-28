@@ -1,1 +1,0 @@
-D:\Rust\spotify-rust\target\debug\simple_web_request.exe: D:\Rust\spotify-rust\src\api_response.rs D:\Rust\spotify-rust\src\entities\album.rs D:\Rust\spotify-rust\src\entities\artist.rs D:\Rust\spotify-rust\src\entities\track.rs D:\Rust\spotify-rust\src\entities.rs D:\Rust\spotify-rust\src\main.rs D:\Rust\spotify-rust\src\token.rs
