@@ -8,7 +8,7 @@ use crate::entities::image::Image;
 use crate::external_url::ExternalUrls;
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct Album {
+pub struct Album {
     name: String,
     artists: Vec<Artist>,
     external_urls: ExternalUrls,

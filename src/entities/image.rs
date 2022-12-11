@@ -1,7 +1,7 @@
 use core::fmt;
 use std::fmt::Formatter;
 
-use crate::Deserialize;
+use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Image {

@@ -1,10 +1,8 @@
 use std::collections::HashMap;
 
 use reqwest::Client;
-use reqwest::header::HeaderValue;
+use reqwest::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, HeaderMap, HeaderValue};
 use serde::Deserialize;
-
-use crate::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, HeaderMap};
 
 const CLIENT_ID: &str = "422489842a194b639397736aefc2a55a";
 const CLIENT_SECRET: &str = "cad6f1f0d0724e50b0ebf9d457142d65";
@@ -45,19 +43,18 @@ fn set_parameters() -> HashMap<&'static str, &'static str> {
     return params;
 }
 
-async fn get_response_json() -> ResponseJson {
+fn get_response_json() -> ResponseJson {
     let headers = generate_header(client_authorization(encode_client_credentials()));
-    let client = Client::new();
+    let client = reqwest::blocking::Client::new();
     let resp = client
         .post(REQUEST_URL)
         .query(&set_parameters())
         .headers(headers)
         .send()
-        .await
         .unwrap();
     match resp.status() {
         reqwest::StatusCode::OK => {
-            return resp.json::<ResponseJson>().await.unwrap();
+            return resp.json::<ResponseJson>().unwrap();
         }
         reqwest::StatusCode::UNAUTHORIZED => {
             panic!("Need new token");
@@ -68,6 +65,6 @@ async fn get_response_json() -> ResponseJson {
     }
 }
 
-pub async fn extract_token() -> String {
-    return get_response_json().await.access_token;
+pub fn extract_token() -> String {
+    return get_response_json().access_token;
 }
