@@ -1,0 +1,30 @@
+Program description:
+The purpose of this program is to be used as a wrapper or add-on for Spotify streaming service, using RUST programming language
+Since the program is using a public api from Spotify which uses OAUTH2 as authentication method, the chosen approach is client credentials flow
+see: https://developer.spotify.com/documentation/general/guides/authorization/client-credentials/
+
+The user can have access to general purpose infomation about tracks (title, length), albums (covers, year), artists (popularity),
+but also to hidden statistics such as availability in different countries
+
+The chosen programming language is RUST, since it is blazingly fast, extremely robust. It is based on public crates for different parts of the program such as:
+tokio - for asynchronous run time
+reqwest - for the api calls
+base64 - encodings and many others
+
+A graphical interface will be used to interact with different functions, while data persistence	will be achieved using ORM 
+see: https://crates.io/crates/diesel (possibility)
+
+The idea with which the project was created is that the user should do very little, but the results should be quite large
+e.g. the user is required to input their login information (id, secret) but not the token. It will be created in the background by a process
+
+
+Use cases:
+One of the first step is generating a client id and secret using Spotify web api:
+https://developer.spotify.com/dashboard/
+
+Actor:  generate token for credentials flow using oauth2
+	input name of band for search queries
+	view album cover in multiple dimensions
+	have access to cover for further use e.g. download, using it as DTO etc.
+
+possible usage: store client id and secret in DB, can use Diesel crate see: https://crates.io/crates/diesel

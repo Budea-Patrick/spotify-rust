@@ -1,21 +1,25 @@
-use reqwest::{Client, StatusCode};
+use std::io::{Read};
+use new_image::{DynamicImage, EncodableLayout, load_from_memory};
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE};
+use reqwest::{Client, StatusCode};
 
-use crate::api_response::{AlbumResponse, ArtistResponse};
+use crate::api_response::{AlbumResponse, ArtistResponse, TrackResponse};
 use crate::entities::album::Album;
 use crate::entities::artist::Artist;
+use crate::entities::track::Track;
 
 pub mod album;
 pub(crate) mod artist;
-mod track;
 mod image;
+pub(crate) mod track;
 
 const JSON_CONTENT_TYPE: &str = "application/json";
 
-pub fn get_album_response(artist: &str, token: String) -> Vec<Album> {
+
+pub fn get_album_response(album: &str, token: String) -> Vec<Album> {
     let url = format!(
-        "https://api.spotify.com/v1/search?q={artist}&type=album",
-        artist = artist);
+        "https://api.spotify.com/v1/search?q={album}&type=album&limit=3",
+        album = album);
     let client = reqwest::blocking::Client::new();
     let response = client.get(url)
         .header(AUTHORIZATION, format!("Bearer {}", token))
@@ -25,6 +29,7 @@ pub fn get_album_response(artist: &str, token: String) -> Vec<Album> {
         .unwrap();
     match response.status() {
         StatusCode::OK => {
+            // println!("{}", response.text().unwrap());
             let parsed = response.json::<AlbumResponse>().unwrap();
             let elements = parsed.albums;
             let albums: Vec<Album> = elements.items;
@@ -40,12 +45,14 @@ pub fn get_album_response(artist: &str, token: String) -> Vec<Album> {
     }
 }
 
-pub fn get_artist_response(artist: &str, token: String) {
+pub fn get_artist_response(artist: &str, token: String) -> Vec<u8> {
     let url = format!(
-        "https://api.spotify.com/v1/search?q={artist}&type=artist",
-        artist = artist);
+        "https://api.spotify.com/v1/search?q={artist}&type=artist&limit=3",
+        artist = artist
+    );
     let client = reqwest::blocking::Client::new();
-    let response = client.get(url)
+    let response = client
+        .get(url)
         .header(AUTHORIZATION, format!("Bearer {}", token))
         .header(CONTENT_TYPE, JSON_CONTENT_TYPE)
         .header(ACCEPT, JSON_CONTENT_TYPE)
@@ -56,10 +63,40 @@ pub fn get_artist_response(artist: &str, token: String) {
             let parsed = response.json::<ArtistResponse>().unwrap();
             let elements = parsed.artists;
             let artists: Vec<Artist> = elements.items;
-            for artist in artists {
-                println!("{}", artist);
-            }
-            //return artists;
+            let artist = artists.first().unwrap();
+            println!("{}", artist);
+            let img_bytes = reqwest::blocking::get(artist.get_artist_image()).unwrap().bytes().unwrap();
+            return img_bytes.to_vec();
+        }
+        StatusCode::UNAUTHORIZED => {
+            println!("Token expired");
+            panic!("Token expired");
+        }
+        _ => {
+            panic!("Unexpected error");
+        }
+    }
+}
+
+pub fn get_track_response(track: &str, token: String) -> Vec<Track> {
+    let url = format!(
+        "https://api.spotify.com/v1/search?q={track}&type=track&limit=3",
+        track = track
+    );
+    let client = reqwest::blocking::Client::new();
+    let response = client
+        .get(url)
+        .header(AUTHORIZATION, format!("Bearer {}", token))
+        .header(CONTENT_TYPE, JSON_CONTENT_TYPE)
+        .header(ACCEPT, JSON_CONTENT_TYPE)
+        .send()
+        .unwrap();
+    match response.status() {
+        StatusCode::OK => {
+            let parsed = response.json::<TrackResponse>().unwrap();
+            let elements = parsed.tracks;
+            let tracks: Vec<Track> = elements.items;
+            return tracks;
         }
         StatusCode::UNAUTHORIZED => {
             println!("Token expired");

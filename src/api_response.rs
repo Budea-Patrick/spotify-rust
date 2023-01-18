@@ -2,6 +2,7 @@ use serde::Deserialize;
 
 use crate::entities::album::Album;
 use crate::entities::artist::Artist;
+use crate::entities::track::Track;
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Items<T> {
@@ -16,4 +17,9 @@ pub(crate) struct AlbumResponse {
 #[derive(Deserialize, Debug)]
 pub(crate) struct ArtistResponse {
     pub(crate) artists: Items<Artist>,
+}
+
+#[derive(Deserialize, Debug)]
+pub(crate) struct TrackResponse {
+    pub(crate) tracks: Items<Track>,
 }

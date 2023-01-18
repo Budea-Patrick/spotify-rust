@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
+use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE};
 use reqwest::Client;
-use reqwest::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, HeaderMap, HeaderValue};
 use serde::Deserialize;
 
 const CLIENT_ID: &str = "422489842a194b639397736aefc2a55a";
@@ -33,7 +33,10 @@ fn generate_header(authorization_string: String) -> HeaderMap {
 
     // The API call requires the content length to be present
     headers.insert(CONTENT_LENGTH, HeaderValue::from(0));
-    headers.insert(CONTENT_TYPE, HeaderValue::from_static(URL_ENCODED_CONTENT_TYPE));
+    headers.insert(
+        CONTENT_TYPE,
+        HeaderValue::from_static(URL_ENCODED_CONTENT_TYPE),
+    );
     return headers;
 }
 

@@ -1,52 +1,33 @@
-mod entities;
 mod api_response;
+mod entities;
 mod external_url;
 mod token;
 
+use crate::entities::{get_album_response, get_artist_response, get_track_response};
+use crate::token::extract_token;
+use fltk::button::Button;
+use fltk::enums::{Color, Event, Font};
+use fltk::frame::Frame;
+use fltk::prelude::{DisplayExt, GroupExt, ImageExt, InputExt, MenuExt, WidgetBase, WidgetExt, WindowExt};
+use fltk::{app, button, frame, image, input, menu, window};
+use new_image::{ColorType, EncodableLayout};
+use reqwest::Client;
 use std::borrow::{Borrow, BorrowMut};
 use std::env;
 use std::fmt::Debug;
 use std::path::Path;
-use fltk::{app, button, frame, image, input, menu, window};
-use fltk::button::Button;
-use fltk::enums::Color;
-use fltk::frame::Frame;
-use fltk::prelude::{GroupExt, ImageExt, InputExt, MenuExt, WidgetExt, WindowExt};
-use new_image::ColorType;
-use reqwest::Client;
+use fltk::image::JpegImage;
+use fltk::text::{TextBuffer, TextDisplay};
 use tokio::runtime::Runtime;
-use crate::entities::{get_album_response, get_artist_response};
-use crate::token::extract_token;
 
-extern crate image as new_image;
 extern crate core;
+extern crate image as new_image;
 
-// mod token;
-// mod entities;
-// mod api_response;
-// mod external_url;
+fn main() {
 
-// fn main() {
-//     let args: Vec<String> = env::args().collect();
-//     if args.len() != 2 {
-//         panic!("Command line argument error");
-//     }
-//
-//     let artist_name = &args[1];
-//     let albums = get_album_response(artist_name, extract_token());
-//     for album in albums {
-//         println!("{}", album);
-//         album.print_covers();
-//     }
-//
-//     let artists = get_artist_response(artist_name, Client::new(), extract_token().await).await;
-//     for artist in artists {
-//         println!("{}", artist);
-//     }
-//
-// }
+    let mut image = image::JpegImage::load("album.jpg")
+        .unwrap();
 
- fn main() {
     let application = app::App::default().with_scheme(app::Scheme::Base);
     let mut window = window::Window::default()
         .with_size(800, 800)
@@ -69,6 +50,54 @@ extern crate core;
         .right_of(&dropdown_menu, 10);
     button.hide();
 
+    let mut frame1 = frame::Frame::default();
+    frame1.set_pos(20, 50);
+    frame1.set_size(200, 200);
+    frame1.hide();
+
+    let mut frame2 = frame::Frame::default();
+    frame2.set_pos(20, 280);
+    frame2.set_size(200, 200);
+    frame2.hide();
+
+    let mut frame3 = frame::Frame::default();
+    frame3.set_pos(20, 500);
+    frame3.set_size(200, 200);
+    frame3.hide();
+
+    let mut text_buffer = TextBuffer::default();
+
+    let mut text1 = TextDisplay::default();
+    text1.set_pos(250, 50);
+    text1.set_size(500, 200);
+    text1.set_buffer(text_buffer.clone());
+    text1.hide();
+
+
+    let mut text2 = TextDisplay::default();
+    text2.set_pos(250, 280);
+    text2.set_size(500, 200);
+    text2.set_buffer(text_buffer.clone());
+    text2.hide();
+
+    let mut text3 = TextDisplay::default();
+    text3.set_pos(250, 500);
+    text3.set_size(500, 200);
+    text3.set_buffer(text_buffer.clone());
+    text3.hide();
+
+    window.handle(move |_, ev| match ev {
+        Event::Push => {
+            if app::event_mouse_button() == app::MouseButton::Left {
+                println!("x = {} - y = {}", app::event_x_root(), app::event_y_root());
+                true
+            } else {
+                false
+            }
+        }
+        _ => false,
+    });
+
     dropdown_menu.set_callback({
         let mut button_clone = button.clone();
         move |this_dropdown_menu| {
@@ -86,9 +115,101 @@ extern crate core;
             let search_query = search_bar.value();
             let token = extract_token();
             match choice.as_str() {
-                "Artist" => get_artist_response(search_query.as_str(), token),
-                "Album" => println!("Album"),
-                "Song" => println!("Song"),
+                "Album" => {
+                    let albums = get_album_response(search_query.as_str(), token.clone());
+                    let mut image_url_vector = Vec::new();
+                    for album in &albums {
+                        image_url_vector.push(album.get_album_image().clone());
+                    }
+
+                    let image_bytes1 = reqwest::blocking::get(image_url_vector.get(0).unwrap()).unwrap().bytes().unwrap();
+                    let image_bytes2 = reqwest::blocking::get(image_url_vector.get(1).unwrap()).unwrap().bytes().unwrap();
+                    let image_bytes3 = reqwest::blocking::get(image_url_vector.get(2).unwrap()).unwrap().bytes().unwrap();
+
+                    let image1 = image::JpegImage::from_data(image_bytes1.as_bytes()).unwrap();
+                    let image2 = image::JpegImage::from_data(image_bytes2.as_bytes()).unwrap();
+                    let image3 = image::JpegImage::from_data(image_bytes3.as_bytes()).unwrap();
+
+                    frame1.set_image_scaled(Some(image1));
+                    frame1.redraw();
+                    frame1.show();
+
+                    frame2.set_image_scaled(Some(image2));
+                    frame2.redraw();
+                    frame2.show();
+
+                    frame3.set_image_scaled(Some(image3));
+                    frame3.redraw();
+                    frame3.show();
+
+                    let mut text_buffer1 = TextBuffer::default();
+                    let mut text_buffer2 = TextBuffer::default();
+                    let mut text_buffer3 = TextBuffer::default();
+
+                    text_buffer1.set_text(albums.get(0).unwrap().print_album_info().as_str());
+                    text1.set_buffer(text_buffer1.clone());
+
+                    text_buffer2.set_text(albums.get(1).unwrap().print_album_info().as_str());
+                    text2.set_buffer(text_buffer2.clone());
+
+                    text_buffer3.set_text(albums.get(2).unwrap().print_album_info().as_str());
+                    text3.set_buffer(text_buffer3.clone());
+
+                    text1.show();
+                    text2.show();
+                    text3.show();
+                },
+                "Artist" => {
+                    let image_bytes = get_artist_response(search_query.as_str(), token.clone());
+                    let image = image::JpegImage::from_data(image_bytes.as_bytes()).unwrap();
+                    frame1.set_image_scaled(Some(image));
+                    frame1.redraw();
+                    frame1.show();
+                }
+                "Song" => {
+                    let tracks = get_track_response(search_query.as_str(), token.clone());
+                    let mut image_url_vector = Vec::new();
+                    for track in &tracks {
+                        image_url_vector.push(track.album.get_album_image());
+                    }
+
+                    let image_bytes1 = reqwest::blocking::get(image_url_vector.get(0).unwrap().as_str()).unwrap().bytes().unwrap();
+                    let image_bytes2 = reqwest::blocking::get(image_url_vector.get(1).unwrap().as_str()).unwrap().bytes().unwrap();
+                    let image_bytes3 = reqwest::blocking::get(image_url_vector.get(2).unwrap().as_str()).unwrap().bytes().unwrap();
+
+                    let image1 = image::JpegImage::from_data(image_bytes1.as_bytes()).unwrap();
+                    let image2 = image::JpegImage::from_data(image_bytes2.as_bytes()).unwrap();
+                    let image3 = image::JpegImage::from_data(image_bytes3.as_bytes()).unwrap();
+
+                    frame1.set_image_scaled(Some(image1));
+                    frame1.redraw();
+                    frame1.show();
+
+                    frame2.set_image_scaled(Some(image2));
+                    frame2.redraw();
+                    frame2.show();
+
+                    frame3.set_image_scaled(Some(image3));
+                    frame3.redraw();
+                    frame3.show();
+
+                    let mut text_buffer1 = TextBuffer::default();
+                    let mut text_buffer2 = TextBuffer::default();
+                    let mut text_buffer3 = TextBuffer::default();
+
+                    text_buffer1.set_text(tracks.get(0).unwrap().print_track_info().as_str());
+                    text1.set_buffer(text_buffer1.clone());
+
+                    text_buffer2.set_text(tracks.get(1).unwrap().print_track_info().as_str());
+                    text2.set_buffer(text_buffer2.clone());
+
+                    text_buffer3.set_text(tracks.get(2).unwrap().print_track_info().as_str());
+                    text3.set_buffer(text_buffer3.clone());
+
+                    text1.show();
+                    text2.show();
+                    text3.show();
+                },
                 _ => {}
             }
         }

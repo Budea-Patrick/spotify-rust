@@ -1,12 +1,14 @@
 use core::fmt;
 use std::fmt::Formatter;
+use std::str::Bytes;
+use new_image::DynamicImage;
 
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub(crate) struct Image {
     height: u16,
-    url: String,
+    pub(crate) url: String,
     width: u16,
 }
 
