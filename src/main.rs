@@ -6,7 +6,7 @@ mod token;
 use crate::entities::{get_album_response, get_artist_response, get_track_response};
 use crate::token::extract_token;
 use fltk::button::Button;
-use fltk::enums::{Color, Event, Font};
+use fltk::enums::{Align, Color, Event, Font};
 use fltk::frame::Frame;
 use fltk::prelude::{DisplayExt, GroupExt, ImageExt, InputExt, MenuExt, WidgetBase, WidgetExt, WindowExt};
 use fltk::{app, button, frame, image, input, menu, window};
@@ -24,9 +24,6 @@ extern crate core;
 extern crate image as new_image;
 
 fn main() {
-
-    let mut image = image::JpegImage::load("album.jpg")
-        .unwrap();
 
     let application = app::App::default().with_scheme(app::Scheme::Base);
     let mut window = window::Window::default()
@@ -65,25 +62,33 @@ fn main() {
     frame3.set_size(200, 200);
     frame3.hide();
 
-    let mut text_buffer = TextBuffer::default();
+    let mut artist_frame = frame::Frame::default();
+    artist_frame.set_pos(150, 50);
+    artist_frame.set_size(500, 500);
+    artist_frame.hide();
+
+    let mut artist_text = TextDisplay::default();
+    artist_text.set_pos(50, 550);
+    artist_text.set_size(700, 230);
+    artist_text.set_text_size(20);
+    artist_text.hide();
 
     let mut text1 = TextDisplay::default();
     text1.set_pos(250, 50);
     text1.set_size(500, 200);
-    text1.set_buffer(text_buffer.clone());
+    text1.set_text_size(20);
     text1.hide();
-
 
     let mut text2 = TextDisplay::default();
     text2.set_pos(250, 280);
     text2.set_size(500, 200);
-    text2.set_buffer(text_buffer.clone());
+    text2.set_text_size(20);
     text2.hide();
 
     let mut text3 = TextDisplay::default();
     text3.set_pos(250, 500);
     text3.set_size(500, 200);
-    text3.set_buffer(text_buffer.clone());
+    text3.set_text_size(20);
     text3.hide();
 
     window.handle(move |_, ev| match ev {
@@ -158,13 +163,32 @@ fn main() {
                     text1.show();
                     text2.show();
                     text3.show();
+
+                    artist_frame.hide();
+                    artist_text.hide();
                 },
                 "Artist" => {
-                    let image_bytes = get_artist_response(search_query.as_str(), token.clone());
+                    let artist_vec = get_artist_response(search_query.as_str(), token.clone());
+                    let artist = artist_vec.first().unwrap();
+                    let image_bytes = reqwest::blocking::get(artist.get_artist_image()).unwrap().bytes().unwrap();
                     let image = image::JpegImage::from_data(image_bytes.as_bytes()).unwrap();
-                    frame1.set_image_scaled(Some(image));
-                    frame1.redraw();
-                    frame1.show();
+                    artist_frame.set_image_scaled(Some(image));
+                    artist_frame.redraw();
+                    artist_frame.show();
+
+                    let mut text_buffer = TextBuffer::default();
+                    text_buffer.set_text(artist.print_artist_info().as_str());
+                    artist_text.set_buffer(text_buffer.clone());
+
+                    text1.hide();
+                    text2.hide();
+                    text3.hide();
+
+                    frame1.hide();
+                    frame2.hide();
+                    frame3.hide();
+
+                    artist_text.show();
                 }
                 "Song" => {
                     let tracks = get_track_response(search_query.as_str(), token.clone());
@@ -209,6 +233,9 @@ fn main() {
                     text1.show();
                     text2.show();
                     text3.show();
+
+                    artist_frame.hide();
+                    artist_text.hide();
                 },
                 _ => {}
             }

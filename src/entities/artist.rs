@@ -10,6 +10,8 @@ pub struct Artist {
     name: String,
     external_urls: ExternalUrls,
     images: Vec<Image>,
+    genres: Vec<String>,
+    popularity: u8,
 }
 
 impl fmt::Display for Artist {
@@ -22,5 +24,19 @@ impl Artist {
     pub(crate) fn get_artist_image(&self) -> &String {
         let image = self.images.first().unwrap();
         return &image.url;
+    }
+
+    pub(crate) fn print_artist_info(&self) -> String {
+        let mut genres = String::new();
+        for genre in &self.genres {
+            genres.push_str(genre.as_str());
+            genres.push_str(", ");
+        }
+        genres.pop();
+        genres.pop();
+        let text = format!("Artist: {}\nGenres: {}\nPopularity: {}\nExternal link: {}",
+                           self.name, genres, self.popularity, self.external_urls.spotify
+        );
+        return text;
     }
 }

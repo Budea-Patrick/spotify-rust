@@ -45,9 +45,9 @@ pub fn get_album_response(album: &str, token: String) -> Vec<Album> {
     }
 }
 
-pub fn get_artist_response(artist: &str, token: String) -> Vec<u8> {
+pub fn get_artist_response(artist: &str, token: String) -> Vec<Artist> {
     let url = format!(
-        "https://api.spotify.com/v1/search?q={artist}&type=artist&limit=3",
+        "https://api.spotify.com/v1/search?q={artist}&type=artist&limit=1",
         artist = artist
     );
     let client = reqwest::blocking::Client::new();
@@ -63,10 +63,7 @@ pub fn get_artist_response(artist: &str, token: String) -> Vec<u8> {
             let parsed = response.json::<ArtistResponse>().unwrap();
             let elements = parsed.artists;
             let artists: Vec<Artist> = elements.items;
-            let artist = artists.first().unwrap();
-            println!("{}", artist);
-            let img_bytes = reqwest::blocking::get(artist.get_artist_image()).unwrap().bytes().unwrap();
-            return img_bytes.to_vec();
+            return artists;
         }
         StatusCode::UNAUTHORIZED => {
             println!("Token expired");
