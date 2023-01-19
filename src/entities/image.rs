@@ -1,8 +1,5 @@
 use core::fmt;
 use std::fmt::Formatter;
-use std::str::Bytes;
-use new_image::DynamicImage;
-
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]

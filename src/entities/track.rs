@@ -1,17 +1,12 @@
 use core::fmt;
 use std::fmt::Formatter;
-use std::ptr::write;
+
 use serde::Deserialize;
 
 use crate::entities::album::Album;
-use crate::entities::artist::Artist;
 use crate::external_url::ExternalUrls;
 
-// #[derive(Deserialize, Debug)]
-// struct ArtistWrapper {
-//     artists: Vec<TrackArtist>
-// }
-
+// wrapper type
 #[derive(Deserialize, Debug)]
 struct TrackArtist {
     name: String,

@@ -1,12 +1,12 @@
 use core::fmt;
-use std::fmt::{format, Formatter};
+use std::fmt::{Formatter};
 
 use serde::Deserialize;
 
-use crate::entities::artist::Artist;
 use crate::entities::image::Image;
 use crate::external_url::ExternalUrls;
 
+// wrapper type
 #[derive(Deserialize, Debug)]
 struct AlbumArtist {
     name: String,

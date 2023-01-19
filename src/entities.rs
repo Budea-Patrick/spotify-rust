@@ -1,7 +1,5 @@
-use std::io::{Read};
-use new_image::{DynamicImage, EncodableLayout, load_from_memory};
+use reqwest::{StatusCode};
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE};
-use reqwest::{Client, StatusCode};
 
 use crate::api_response::{AlbumResponse, ArtistResponse, TrackResponse};
 use crate::entities::album::Album;
@@ -29,7 +27,6 @@ pub fn get_album_response(album: &str, token: String) -> Vec<Album> {
         .unwrap();
     match response.status() {
         StatusCode::OK => {
-            // println!("{}", response.text().unwrap());
             let parsed = response.json::<AlbumResponse>().unwrap();
             let elements = parsed.albums;
             let albums: Vec<Album> = elements.items;

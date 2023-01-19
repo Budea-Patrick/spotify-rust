@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE};
-use reqwest::Client;
+use reqwest::header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, HeaderMap, HeaderValue};
 use serde::Deserialize;
 
 const CLIENT_ID: &str = "422489842a194b639397736aefc2a55a";

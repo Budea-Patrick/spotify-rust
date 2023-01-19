@@ -1,6 +1,7 @@
 use core::fmt;
-use serde::Deserialize;
 use std::fmt::Formatter;
+
+use serde::Deserialize;
 
 use crate::entities::image::Image;
 use crate::external_url::ExternalUrls;
